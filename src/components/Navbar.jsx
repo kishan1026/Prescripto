@@ -24,6 +24,10 @@ const Navbar = () => {
                 <li className='py-1'>ABOUT</li>
                 <hr className='border-none outline-none h-0.5 bg-#5f6FFF w-3/5 -auto hidden' />
             </NavLink>
+            <NavLink to='/gallery'>
+                <li className='py-1'>GALLERY</li>
+                <hr className='border-none outline-none h-0.5 bg-#5f6FFF w-3/5 -auto hidden'/>
+            </NavLink>
             <NavLink to='/contact'>
                 <li className='py-1'>CONTACT</li>
                 <hr className='border-none outline-none h-0.5 bg-#5f6FFF w-3/5 -auto hidden'/>
