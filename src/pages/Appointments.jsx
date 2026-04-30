@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { useParams } from 'react-router-dom'
-import { AppContext } from '../context/AppContent'
+import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
+import { useNavigate } from 'react-router-dom';
 
 const Appointments = () => {
 
@@ -14,6 +15,7 @@ const Appointments = () => {
   const [docSlots, setDocSlots] = useState([])
   const [slotIndex, setSlotIndex] = useState(0)
   const [slotTime, setSlotTime] = useState('')
+  const navigate = useNavigate();
 
   // fetch doctor
   const fetchDocInfo = () => {
@@ -70,9 +72,19 @@ const Appointments = () => {
 
   // booking function
   const bookAppointment = () => {
+
+    // ✅ CHECK LOGIN
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+  
+    if (!isLoggedIn) {
+      alert("Please login first ❌");
+      navigate("/login");
+      return;
+    }
+  
     if (!slotTime) {
-      alert("Please select a time slot")
-      return
+      alert("Please select a time slot");
+      return;
     }
   
     const bookingData = {
@@ -81,19 +93,16 @@ const Appointments = () => {
       speciality: docInfo.speciality,
       date: docSlots[slotIndex][0].datetime.toDateString(),
       time: slotTime
-    }
+    };
   
-    // get old bookings
-    let oldBookings = JSON.parse(localStorage.getItem("appointments")) || []
+    let oldBookings = JSON.parse(localStorage.getItem("appointments")) || [];
   
-    // add new booking
-    oldBookings.push(bookingData)
+    oldBookings.push(bookingData);
   
-    // save again
-    localStorage.setItem("appointments", JSON.stringify(oldBookings))
+    localStorage.setItem("appointments", JSON.stringify(oldBookings));
   
-    alert("Appointment Booked ✅")
-  }
+    alert("Appointment Booked ✅");
+  };
 
   return docInfo && (
     <div>

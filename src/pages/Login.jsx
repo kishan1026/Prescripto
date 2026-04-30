@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 
 const Login = () => {
+
+  const navigate = useNavigate();
+  const { login } = useContext(AppContext);
+
   const [isLogin, setIsLogin] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -22,7 +28,6 @@ const Login = () => {
     }
 
     if (isLogin) {
-      // LOGIN LOGIC
       const storedUser = JSON.parse(localStorage.getItem("user"));
 
       if (
@@ -31,11 +36,16 @@ const Login = () => {
         storedUser.password === formData.password
       ) {
         alert("Login Successful ✅");
+
+        // ✅ CONTEXT LOGIN
+        login(storedUser);
+
+        navigate("/");
       } else {
         alert("Invalid Email or Password ❌");
       }
+
     } else {
-      // SIGNUP LOGIC
       if (!formData.name) {
         alert("Name required");
         return;
@@ -43,6 +53,7 @@ const Login = () => {
 
       localStorage.setItem("user", JSON.stringify(formData));
       alert("Account Created Successfully ✅");
+
       setIsLogin(true);
     }
 
@@ -50,7 +61,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-200 flex items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 flex items-center justify-center px-6 py-12">
+      
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
 
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
@@ -94,7 +106,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-3 rounded-lg hover:scale-105 transition"
+            className="w-full bg-black text-white py-3 rounded-lg transition transform active:scale-95 md:hover:scale-105"
           >
             {isLogin ? "Login" : "Create Account"}
           </button>
@@ -110,6 +122,7 @@ const Login = () => {
             {isLogin ? "Sign up" : "Login here"}
           </span>
         </p>
+
       </div>
     </div>
   );
