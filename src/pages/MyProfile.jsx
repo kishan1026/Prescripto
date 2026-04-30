@@ -15,7 +15,7 @@ const MyProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 px-6 md:px-16 py-12">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-200 px-6 md:px-16 py-12">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8">
 
         {/* Heading */}
