@@ -7,12 +7,13 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false); // ✅ FIX
 
-  // ✅ Context use
-  const { token, user, logout } = useContext(AppContext);
+  const { token, logout } = useContext(AppContext);
 
   return (
     <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-300">
+
       {/* Logo */}
       <img
         onClick={() => {
@@ -26,67 +27,65 @@ const Navbar = () => {
 
       {/* Desktop Menu */}
       <ul className="hidden md:flex items-start gap-5 font-medium">
-        <NavLink to="/">
-          <li>HOME</li>
-        </NavLink>
-        <NavLink to="/doctors">
-          <li>ALL DOCTORS</li>
-        </NavLink>
-        <NavLink to="/about">
-          <li>ABOUT</li>
-        </NavLink>
-        <NavLink to="/gallery">
-          <li>GALLERY</li>
-        </NavLink>
-        <NavLink to="/contact">
-          <li>CONTACT</li>
-        </NavLink>
+        <NavLink to="/"><li>HOME</li></NavLink>
+        <NavLink to="/doctors"><li>ALL DOCTORS</li></NavLink>
+        <NavLink to="/about"><li>ABOUT</li></NavLink>
+        <NavLink to="/gallery"><li>GALLERY</li></NavLink>
+        <NavLink to="/contact"><li>CONTACT</li></NavLink>
       </ul>
 
       {/* Right Section */}
       <div className="flex items-center gap-4">
+
         {token ? (
-          <div className="flex items-center gap-2 cursor-pointer group relative">
-            {/* Profile + Name */}
-            <div className="flex items-center gap-2">
-              <img
-                className="w-8 rounded-full"
-                src={assets.profile_pic}
-                alt=""
-              />
-              <p className="text-sm font-medium hidden sm:block">
-                {user?.name}
-              </p>
+          <div className="relative">
+
+            {/* Profile Click */}
+            <div
+              onClick={() => setOpenDropdown(!openDropdown)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <img className="w-8 rounded-full" src={assets.profile_pic} alt="" />
+              <img className="w-2.5" src={assets.dropdown_icon} alt="" />
             </div>
 
-            <img className="w-2.5" src={assets.dropdown_icon} alt="" />
-
             {/* Dropdown */}
-            <div className="absolute top-0 right-0 pt-14 hidden group-hover:block">
-              <div className="min-w-48 bg-white shadow-lg rounded flex flex-col gap-3 p-4">
+            {openDropdown && (
+              <div className="absolute right-0 mt-3 w-48 bg-white shadow-lg rounded flex flex-col gap-3 p-4 z-20">
+
                 <p
-                  onClick={() => navigate("/my-profile")}
-                  className="cursor-pointer"
+                  onClick={() => {
+                    navigate("/my-profile");
+                    setOpenDropdown(false);
+                  }}
+                  className="cursor-pointer hover:text-black"
                 >
                   My Profile
                 </p>
+
                 <p
-                  onClick={() => navigate("/my-appointments")}
-                  className="cursor-pointer"
+                  onClick={() => {
+                    navigate("/my-appointments");
+                    setOpenDropdown(false);
+                  }}
+                  className="cursor-pointer hover:text-black"
                 >
                   My Appointments
                 </p>
+
                 <p
                   onClick={() => {
                     logout();
                     navigate("/");
+                    setOpenDropdown(false);
                   }}
-                  className="cursor-pointer"
+                  className="cursor-pointer hover:text-black"
                 >
                   Logout
                 </p>
+
               </div>
-            </div>
+            )}
           </div>
         ) : (
           <button
@@ -110,34 +109,22 @@ const Navbar = () => {
       {showMenu && (
         <div className="fixed inset-0 bg-white z-50 flex flex-col p-6">
           <div className="flex justify-end">
-            <p
-              onClick={() => setShowMenu(false)}
-              className="text-2xl cursor-pointer"
-            >
+            <p onClick={() => setShowMenu(false)} className="text-2xl cursor-pointer">
               ✖
             </p>
           </div>
 
           <div className="flex flex-col gap-6 mt-10 text-lg font-medium">
-            <NavLink onClick={() => setShowMenu(false)} to="/">
-              HOME
-            </NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to="/doctors">
-              ALL DOCTORS
-            </NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to="/about">
-              ABOUT
-            </NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to="/gallery">
-              GALLERY
-            </NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to="/contact">
-              CONTACT
-            </NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to="/">HOME</NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to="/doctors">ALL DOCTORS</NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to="/about">ABOUT</NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to="/gallery">GALLERY</NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to="/contact">CONTACT</NavLink>
           </div>
         </div>
       )}
     </div>
   );
 };
+
 export default Navbar;
