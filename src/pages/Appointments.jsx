@@ -2,9 +2,18 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
+import AlertBox from "../components/AlertBox";
 import { useNavigate } from 'react-router-dom';
 
 const Appointments = () => {
+  const [alert, setAlert] = useState({
+    show: false,
+    message: "",
+    type: ""
+  });
+  const showAlert = (msg, type="error") => {
+    setAlert({ show: true, message: msg, type });
+  };
 
   const { docId } = useParams()
   const { doctors, currencySymbol } = useContext(AppContext)
@@ -77,13 +86,13 @@ const Appointments = () => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
   
     if (!isLoggedIn) {
-      alert("Please login first ❌");
+      showAlert("Please login first ❌");
       navigate("/login");
       return;
     }
   
     if (!slotTime) {
-      alert("Please select a time slot");
+      showAlert("Please select a time slot");
       return;
     }
   
@@ -101,7 +110,7 @@ const Appointments = () => {
   
     localStorage.setItem("appointments", JSON.stringify(oldBookings));
   
-    alert("Appointment Booked ✅");
+    showAlert("Appointment Booked ✅", "success");
   };
 
   return docInfo && (
@@ -174,6 +183,14 @@ const Appointments = () => {
           Book Appointment
         </button>
       </div>
+
+      {alert.show && (
+  <AlertBox
+    message={alert.message}
+    type={alert.type}
+    onClose={() => setAlert({ ...alert, show: false })}
+  />
+)}
 
     </div>
   )
