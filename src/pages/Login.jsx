@@ -1,12 +1,13 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import Toast from "../components/Toast";
 
 const Login = () => {
-
   const navigate = useNavigate();
-  const { login } = useContext(AppContext);
+  const { setToken } = useContext(AppContext);
 
+  const [toast, setToast] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -19,50 +20,71 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
-      alert("Please fill all fields");
-      return;
-    }
+    const url = isLogin
+      ? "http://localhost:8080/api/auth/login"
+      : "http://localhost:8080/api/auth/register";
 
-    if (isLogin) {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-      if (
-        storedUser &&
-        storedUser.email === formData.email &&
-        storedUser.password === formData.password
-      ) {
-        alert("Login Successful ✅");
+      const data = await res.json();
 
-        // ✅ CONTEXT LOGIN
-        login(storedUser);
+      if (res.ok && data.token) {
+        localStorage.setItem("token", data.token);
+        setToken(data.token);
 
-        navigate("/");
+        setToast({
+          message: isLogin
+            ? "Login Successful ✅"
+            : "Account Created Successfully 🎉",
+          type: "success",
+        });
+
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+        });
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
       } else {
-        alert("Invalid Email or Password ❌");
+        setToast({
+          message: data.message || "Something went wrong ❌",
+          type: "error",
+        });
       }
-
-    } else {
-      if (!formData.name) {
-        alert("Name required");
-        return;
-      }
-
-      localStorage.setItem("user", JSON.stringify(formData));
-      alert("Account Created Successfully ✅");
-
-      setIsLogin(true);
+    } catch (error) {
+      console.log(error);
+      setToast({
+        message: "Server error ❌",
+        type: "error",
+      });
     }
-
-    setFormData({ name: "", email: "", password: "" });
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-200 flex items-center justify-center px-6 py-12">
-      
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 flex items-center justify-center px-6 py-12">
+
+      {/* Toast */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
 
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
@@ -70,7 +92,7 @@ const Login = () => {
         </h1>
 
         <p className="text-center text-gray-500 mb-8">
-          Welcome to Priscripto Hospital Management System
+          Welcome to Prescripto Hospital Management System
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -82,6 +104,7 @@ const Login = () => {
               placeholder="Full Name"
               value={formData.name}
               onChange={handleChange}
+              required
               className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black"
             />
           )}
@@ -92,6 +115,7 @@ const Login = () => {
             placeholder="Email Address"
             value={formData.email}
             onChange={handleChange}
+            required
             className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black"
           />
 
@@ -101,6 +125,7 @@ const Login = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
+            required
             className="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black"
           />
 

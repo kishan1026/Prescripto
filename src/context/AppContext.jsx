@@ -7,27 +7,45 @@ const AppContextProvider = (props) => {
 
   const currencySymbol = '$';
 
-  // 🔥 AUTH STATE
-  const [token, setToken] = useState(localStorage.getItem("isLoggedIn"));
+  // ✅ TOKEN (real auth)
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+
+  // ✅ USER DATA (optional future use)
   const [user, setUser] = useState(null);
 
+  // 🔥 Fetch user (optional - future use)
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-    setUser(storedUser);
-  }, []);
+    const fetchUser = async () => {
+      if (!token) return;
 
-  // LOGIN FUNCTION
-  const login = (userData) => {
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("currentUser", JSON.stringify(userData));
-    setToken("true");
-    setUser(userData);
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUser();
+  }, [token]);
+
+  // ✅ LOGIN (store token only)
+  const login = (token) => {
+    localStorage.setItem("token", token);
+    setToken(token);
   };
 
-  // LOGOUT FUNCTION
+  // ✅ LOGOUT
   const logout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("currentUser");
+    localStorage.removeItem("token");
     setToken(null);
     setUser(null);
   };
@@ -36,9 +54,10 @@ const AppContextProvider = (props) => {
     doctors,
     currencySymbol,
     token,
+    setToken,
     user,
     login,
-    logout
+    logout,
   };
 
   return (
